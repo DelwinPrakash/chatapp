@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { Text, View, KeyboardAvoidingView, Platform } from "react-native";
+import { Text, View, KeyboardAvoidingView, Platform, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import { GiftedChat, Bubble, InputToolbar, Composer } from "react-native-gifted-chat";
+import { useRoute } from '@react-navigation/native';
 
 export default function Index() {
   const [message, setMessages] = useState([]);
+
+    // const route = useRoute();
+    // const { chatId } = route.params;
 
     useEffect(() => {
         // Add some demo messages on component mount
@@ -48,14 +52,14 @@ export default function Index() {
         <Bubble
             {...props}
             wrapperStyle={{
-            right: {
-                backgroundColor: "#443051",
-                // marginBottom: 5,
-            },
-            left: {
-                backgroundColor: "#826723",
-                // marginBottom: 5,
-            }
+                right: {
+                    backgroundColor: "#443051",
+                    // marginBottom: 5,
+                },
+                left: {
+                    backgroundColor: "#826723",
+                    // marginBottom: 5,
+                }
             }}
             textStyle={{
             left:{
@@ -66,14 +70,20 @@ export default function Index() {
                 right: { marginBottom: 5 },
                 left: { marginBottom: 5 },
             }} 
-            renderAvatar={(props) => {
-                return <Image source={{uri: props.currentMessage.user.avatar}}/>
-            }}
             // tick={true}
-        />
+            />
         );
     }
+    
+    const renderAvatar = (props) => {
+        return (
+            <Image
+                source={{uri: props.currentMessage.user.avatar}}
+                style={{ width: 40, height: 40, borderRadius: 20, marginBottom: 5 }}
+            />
+        );
 
+    }
 
     const onSend = (newMessages = []) => {
         setMessages((previousMessages) => GiftedChat.append(previousMessages, newMessages));
@@ -81,58 +91,22 @@ export default function Index() {
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-            <SafeAreaView style={{flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#1F1A20"}}>
+            <SafeAreaView style={{flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#1F1A20", borderWidth: 1}}>
                 <StatusBar barStyle={"light-content"} backgroundColor={"#123456"}/>
-                {/* <View>
-                    <Text style={{color: "white"}}>This is the home page of this app</Text>
-                </View> */}
-                <GiftedChat
-                    messages={message}
-                    onSend={(newMessages) => onSend(newMessages)}
-                    user={{
-                        _id: 1, // Set your user ID (can be dynamic later when using a real auth system)
-                        name: 'You',
-                    }}
-                    alwaysShowSend={true}
-                    renderBubble={renderBubble}
-                />
+                <View style={{flex: 1, width: "100%"}}>
+                    <GiftedChat
+                        messages={message}
+                        onSend={(newMessages) => onSend(newMessages)}
+                        user={{
+                            _id: 1, // Set your user ID (can be dynamic later when using a real auth system)
+                            name: 'You',
+                        }}
+                        alwaysShowSend={true}
+                        renderBubble={renderBubble}
+                        renderAvatar={renderAvatar}
+                    />
+                </View>
             </SafeAreaView>
         </KeyboardAvoidingView>
     );
 }
-
-// import React, { useState } from 'react';
-// import { View, TextInput, KeyboardAvoidingView, Platform, Text, StyleSheet } from 'react-native';
-// import { GiftedChat } from 'react-native-gifted-chat';
-
-// const Index = () => {
-//   const [messages, setMessages] = useState([]);
-
-//   const onSend = (newMessages = []) => {
-//     setMessages(GiftedChat.append(messages, newMessages));
-//   };
-
-//   return (
-//     <KeyboardAvoidingView
-//       style={styles.container}
-//       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-//     >
-//       <GiftedChat
-//         messages={messages}
-//         onSend={onSend}
-//         user={{
-//           _id: 1, // Example user ID
-//         }}
-//       />
-//     </KeyboardAvoidingView>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: "#123456"
-//   },
-// });
-
-// export default Index;
