@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert 
 import { useNavigation } from "@react-navigation/native";
 import { supabase } from "../../lib/supabase";
 import { ActivityIndicator } from "react-native-web";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,6 +14,8 @@ export default function Auth() {
   const [error, setError] = useState(null);
 
   const navigation = useNavigation();
+  const { user } = useAuth();
+  console.log("hello",user);
 
   async function signInWithEmail() {
     setError(null)
