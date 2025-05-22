@@ -171,11 +171,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    avatarText: {
-        color: 'white',
-        fontSize: 20,
-        fontWeight: 'bold',
-    },
+    // avatarText: {
+    //     color: 'white',
+    //     fontSize: 20,
+    //     fontWeight: 'bold',
+    // },
     onlineIndicator: {
         width: 12,
         height: 12,
@@ -198,6 +198,7 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 16,
         fontWeight: 'bold',
+        color: "#fff"
     },
     timestamp: {
         fontSize: 12,
