@@ -31,9 +31,25 @@ import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Pressable } from 'react-native';
 import { Link } from 'expo-router';
+import { useAuth } from '../context/AuthContext';
+import { ActivityIndicator } from 'react-native';
 
 export default function Index(){
-  // Mock data for demonstration
+  const navigation = useNavigation();
+  const { user, userLoading } = useAuth();
+
+  console.log("hello",user);
+
+  if(userLoading){
+      return <View style={[styles.container, styles.center]}>
+          <ActivityIndicator size="large" color="#00f0ff" />
+      </View>
+  }
+
+  if(!user){
+      navigation.replace("auth/index");
+      return null;  
+  }
   
   const chats = [
     {
@@ -62,7 +78,6 @@ export default function Index(){
     },
   ];
 
-  const navigation = useNavigation();
 
   const renderItem = ({ item }) => (
     <TouchableOpacity 

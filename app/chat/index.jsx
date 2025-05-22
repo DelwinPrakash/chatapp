@@ -4,9 +4,10 @@ import { Text, View, KeyboardAvoidingView, Platform, Image } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GiftedChat, Bubble, InputToolbar, Composer } from "react-native-gifted-chat";
 import { useRoute } from '@react-navigation/native';
+import { useAuth } from "../../context/AuthContext";
 
 export default function Index() {
-  const [message, setMessages] = useState([]);
+    const [message, setMessages] = useState([]);
 
     // const route = useRoute();
     // const { chatId } = route.params;

@@ -14,8 +14,18 @@ export default function Auth() {
   const [error, setError] = useState(null);
 
   const navigation = useNavigation();
-  const { user } = useAuth();
+  const { user, userLoading } = useAuth();
   console.log("hello",user);
+
+  if(userLoading){
+    return <View style={styles.container}>
+      <ActivityIndicator size="large" color="#00f0ff" />
+    </View>
+  }
+
+  if(user){
+    navigation.replace("index");
+  }
 
   async function signInWithEmail() {
     setError(null)
