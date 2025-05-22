@@ -1,93 +1,8 @@
-// import React, { useState } from 'react'
-// import { Alert, StyleSheet, View } from 'react-native'
-// // import { supabase } from '../lib/supabase'
-// import { Button, Input } from '@rneui/themed'
-
-// export default function Auth() {
-//   const [email, setEmail] = useState('')
-//   const [password, setPassword] = useState('')
-//   const [loading, setLoading] = useState(false)
-
-// //   async function signInWithEmail() {
-// //     setLoading(true)
-// //     const { error } = await supabase.auth.signInWithPassword({
-// //       email: email,
-// //       password: password,
-// //     })
-
-// //     if (error) Alert.alert(error.message)
-// //     setLoading(false)
-// //   }
-
-// //   async function signUpWithEmail() {
-// //     setLoading(true)
-// //     const {
-// //       data: { session },
-// //       error,
-// //     } = await supabase.auth.signUp({
-// //       email: email,
-// //       password: password,
-// //     })
-
-// //     if (error) Alert.alert(error.message)
-// //     if (!session) Alert.alert('Please check your inbox for email verification!')
-// //     setLoading(false)
-// //   }
-
-//   return (
-//     <View style={styles.container}>
-//       <View style={[styles.verticallySpaced, styles.mt20]}>
-//         <Input
-//           label="Email"
-//           leftIcon={{ type: 'font-awesome', name: 'envelope' }}
-//         //   onChangeText={(text) => setEmail(text)}
-//           value={email}
-//           placeholder="email@address.com"
-//           autoCapitalize={'none'}
-//         />
-//       </View>
-//       <View style={styles.verticallySpaced}>
-//         <Input
-//           label="Password"
-//           leftIcon={{ type: 'font-awesome', name: 'lock' }}
-//         //   onChangeText={(text) => setPassword(text)}
-//           value={password}
-//           secureTextEntry={true}
-//           placeholder="Password"
-//           autoCapitalize={'none'}
-//         />
-//       </View>
-//       <View style={[styles.verticallySpaced, styles.mt20]}>
-//         <Button title="Sign in" disabled={loading} />
-//       </View>
-//       <View style={styles.verticallySpaced}>
-//         <Button title="Sign up" disabled={loading} />
-//       </View>
-//     </View>
-//   )
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     marginTop: 40,
-//     padding: 12,
-//   },
-//   verticallySpaced: {
-//     paddingTop: 4,
-//     paddingBottom: 4,
-//     alignSelf: 'stretch',
-//   },
-//   mt20: {
-//     marginTop: 20,
-//   },
-// })
-
-
-
-
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { supabase } from "../../lib/supabase";
+import { ActivityIndicator } from "react-native-web";
 
 export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
@@ -95,21 +10,29 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [login, setLogin] = useState(true);
+  const [error, setError] = useState(null);
 
   const navigation = useNavigation();
 
   async function signInWithEmail() {
+    setError(null)
     setLoading(true)
     const { error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
     })
 
-    if (error) Alert.alert(error.message)
+    if (error){
+      Alert.alert(error.message)
+      setError(error.message)
+    }else{
+      navigation.replace("index");
+    }
     setLoading(false)
   }
 
   async function signUpWithEmail() {
+    setError(null)
     setLoading(true)
     const {
       data: { session },
@@ -119,17 +42,20 @@ export default function Auth() {
       password: password,
     })
 
-    if (error) Alert.alert(error.message)
+    if (error){
+      Alert.alert(error.message)
+      setError(error.message)
+    }
     if (!session) Alert.alert('Please check your inbox for email verification!')
     setLoading(false)
   }
-
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.innerContainer}>
         <Text style={styles.title}>{login ? "Login" : "Sign Up"}</Text>
         <View style={styles.formContainer}>
+
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Email address</Text>
             <TextInput
@@ -142,6 +68,7 @@ export default function Auth() {
               autoCapitalize="none"
             />
           </View>
+
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Password</Text>
             <View style={styles.passwordInputContainer}>
@@ -163,12 +90,22 @@ export default function Auth() {
               </TouchableOpacity>
             </View>
           </View>
+
+          <View>
+              <Text style={{ color: "red" }}>{error}</Text>
+          </View>
+
           <TouchableOpacity style={styles.loginButton}
             onPress={() => login ? signInWithEmail() : signUpWithEmail()}
             disabled={loading}
           >
-            <Text style={styles.loginButtonText}>{login ? "Log in" : "Sign Up"}</Text>
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.loginButtonText}>{login ? "Log in" : "Sign Up"}</Text>
+            )}
           </TouchableOpacity>
+          
           <View style={styles.linksContainer}>
             <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
               {login && <Text style={styles.linkText}>Forgot password?</Text>}
@@ -177,6 +114,7 @@ export default function Auth() {
               <Text style={styles.linkText}>{login ? "Sign Up" : "Login"}</Text>
             </TouchableOpacity>
           </View>
+
         </View>
       </View>
     </ScrollView>
