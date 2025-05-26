@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { supabase } from "../../lib/supabase";
@@ -17,14 +17,16 @@ export default function Auth() {
   const { user, userLoading } = useAuth();
   console.log("hello",user);
 
+  useEffect(() => {
+    if(user){
+      navigation.replace("index");
+    }
+  }, [user, userLoading])
+  
   if(userLoading){
     return <View style={styles.container}>
       <ActivityIndicator size="large" color="#00f0ff" />
     </View>
-  }
-
-  if(user){
-    navigation.replace("index");
   }
 
   async function signInWithEmail() {
