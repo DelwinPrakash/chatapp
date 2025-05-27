@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { GiftedChat, Bubble, Avatar } from 'react-native-gifted-chat';
 import { useAuth } from '../../context/AuthContext';
+import { sendMessage } from '../../lib/message';
 
 export default function ChatScreen({ route }) {
     const navigation = useNavigation();
@@ -13,6 +14,7 @@ export default function ChatScreen({ route }) {
     const { user, userLoading } = useAuth();
     const [messages, setMessages] = useState([]);
     const [title, setTitle] = useState('');
+    const [isSending, setIsSending] = useState(false);
     
     useLayoutEffect(() => {
         navigation.setOptions({title: title || 'Chat', headerStyle: {backgroundColor: '#3e787a'}});
@@ -70,7 +72,6 @@ export default function ChatScreen({ route }) {
             supabase.removeChannel(channel);
         };
 
-
     }, [user, userLoading, conversationId]);
 
     if(userLoading){
@@ -116,16 +117,26 @@ export default function ChatScreen({ route }) {
     //     );
     // }
 
+    const onSend = async (newMessages = []) => {
+        console.log(newMessages);
+        if(!newMessages || newMessages.length === 0) return;
+
+        setIsSending(true);
+        try{
+            setMessages((previousMessages) => GiftedChat.append(previousMessages, newMessages));
+
+            const sentMessage = sendMessage({
+                conversationId: conversationId,
+                senderId: user.id,
+                content: newMessages[0].text
+            });
+            
+        }finally{
+            setIsSending(false);
+        }
+    }
+
     return (
-        // <FlatList
-        //     data={messages}
-        //     renderItem={({ item }) => (
-        //         <View>
-        //             <Text>{item.content}</Text>
-        //         </View>
-        //     )}
-        //     keyExtractor={(item) => item.id}
-        // />
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <SafeAreaView style={{flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#1F1A20", borderWidth: 1}}>
                 <StatusBar barStyle={"light-content"} backgroundColor={"#123456"}/>
