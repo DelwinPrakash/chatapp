@@ -200,7 +200,7 @@ export default function Index(){
               {item.title || otherParticipant?.username || 'Unknown'}
             </Text>
             <Text style={styles.timestamp}>
-              {item.messages[0]?.created_at}
+              {item.messages[0]?.created_at.replace("T", " ").split(".")[0]}
             </Text>
           </View>
           <View style={styles.messageContainer}>
