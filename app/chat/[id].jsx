@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { GiftedChat, Bubble, Avatar } from 'react-native-gifted-chat';
 import { useAuth } from '../../context/AuthContext';
 import { sendMessage } from '../../lib/message';
+import { DateTime } from 'luxon';
 
 export default function ChatScreen({ route }) {
     const navigation = useNavigation();
@@ -30,10 +31,11 @@ export default function ChatScreen({ route }) {
 
             if (error) console.error(error);
             else {
-                const giftedChatMessages = data.map((msg, index) => ({
+                const giftedChatMessages = data.map(msg => ({
                     _id: msg.id, 
                     text: msg.content,
-                    createdAt: new Date(msg.created_at),
+                    // createdAt: new Date(msg.created_at),
+                    createdAt: DateTime.fromISO(msg.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').toFormat('yyyy-MM-dd HH:mm:ss'),
                     user: {
                         _id: msg.sender_id,
                         name: msg.sender_name || 'Unknown'
@@ -63,7 +65,36 @@ export default function ChatScreen({ route }) {
                     filter: `conversation_id=eq.${conversationId}`,
                 },
                 (payload) => {
-                    setMessages((prev) => [...prev, payload.new]);
+
+                    const newMessage = {
+                        _id: payload.new.id, 
+                        text: payload.new.content,
+                        createdAt: DateTime.fromISO(payload.new.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').toFormat('yyyy-MM-dd HH:mm:ss'),
+                        user: {
+                            _id: payload.new.sender_id,
+                            name: payload.new.sender_name || 'Unknown'
+                        }
+                    }
+                    setMessages((prev) => [...prev, newMessage]);
+                    console.log('message:', messages);
+                    
+                    // const newMessage = payload.new;
+                    // if (newMessage.conversation_id === conversationId) {
+                    //     setMessages((prev) => {
+                    //         if (prev.some(msg => msg._id === newMessage.id)) return prev;
+
+                    //         return [...prev, {
+                    //             _id: newMessage.id,
+                    //             text: newMessage.content,
+                    //             createdAt: DateTime.fromISO(newMessage.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').toFormat('yyyy-MM-dd HH:mm:ss'),
+                    //             user: {
+                    //                 _id: newMessage.sender_id,
+                    //                 name: newMessage.sender_name || 'Unknown'
+                    //             }
+                    //         }];
+                    //     });
+                    // }
+
                 }
             )
             .subscribe();
@@ -72,7 +103,7 @@ export default function ChatScreen({ route }) {
             supabase.removeChannel(channel);
         };
 
-    }, [user, userLoading, conversationId]);
+    }, [messages.length, conversationId]);
 
     if(userLoading){
         return <View style={{flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#1F1A20"}}>
@@ -135,7 +166,7 @@ export default function ChatScreen({ route }) {
             setIsSending(false);
         }
     }
-
+    console.log("hiii", messages.length)
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <SafeAreaView style={{flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#1F1A20", borderWidth: 1}}>
