@@ -36,6 +36,7 @@ import { ActivityIndicator } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { TextInput } from 'react-native-gesture-handler';
+import { DateTime } from 'luxon';
 
 export default function Index(){
   const navigation = useNavigation();
@@ -53,6 +54,7 @@ export default function Index(){
 
     if (user) {
       const fetchChats = async () => {
+        // console.log('someone called mehhh')
         const { data, error } = await supabase
           .from('conversations')
           .select(`
@@ -87,12 +89,12 @@ export default function Index(){
           {
             event: '*',
             schema: 'public',
-            table: 'conversations',
-            filter: `participants.user_id=eq.${user.id}`
+            table: 'conversations',  
+            // filter: `participants.user_id=eq.${user.id}`
           },
           (payload) => {
-            // Update chats list when changes occur
             fetchChats();
+            // console.log('Realtime payload:', payload);
           }
         )
         .subscribe();
@@ -178,6 +180,7 @@ export default function Index(){
   // );
 
   const renderItem = ({ item }) => {
+    // console.log("Other Participant:", item);
     const otherParticipant = item.participants.find(p => p.user_id !== user.id);
     
     return (
@@ -200,7 +203,8 @@ export default function Index(){
               {item.title || otherParticipant?.username || 'Unknown'}
             </Text>
             <Text style={styles.timestamp}>
-              {item.messages[0]?.created_at.replace("T", " ").split(".")[0]}
+              {/* {item.messages[item.messages.length-1]?.created_at.replace("T", " ").split(".")[0]} */}
+              {DateTime.fromISO(item.messages[item.messages.length-1]?.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').hasSame(DateTime.now().setZone('Asia/Kolkata'), 'day') ? DateTime.fromISO(item.messages[item.messages.length-1]?.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').toFormat('HH:mm') : DateTime.fromISO(item.messages[item.messages.length-1]?.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').toFormat('MMM dd')}
             </Text>
           </View>
           <View style={styles.messageContainer}>
@@ -209,7 +213,7 @@ export default function Index(){
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {item.messages[0]?.content || 'No messages yet'}
+              {item.messages[item.messages?.length-1]?.content || 'No messages yet'}
             </Text>
             {item.unreadCount > 0 && (
               <View style={styles.unreadBadge}>
@@ -224,11 +228,6 @@ export default function Index(){
 
   return (
     <View style={styles.container}>
-      {/* <View style={styles.header}>
-        <Text style={styles.headerTitle}>Messages</Text>
-        <TouchableOpacity>
-        </TouchableOpacity>
-      </View> */}
 
       <View style={styles.container}>
         <View style={styles.header}>
@@ -290,18 +289,18 @@ const styles = StyleSheet.create({
       alignItems: "center",
       textAlign: "center"
   },
-  // header: {
-  //     flexDirection: 'row',
-  //     justifyContent: 'space-between',
-  //     alignItems: 'center',
-  //     padding: 16,
-  //     borderBottomWidth: 1,
-  //     borderBottomColor: '#eee',
-  // },
-  // headerTitle: {
-  //     fontSize: 40,
-  //     fontWeight: 'bold',
-  // },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#1a2f30',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white',
+  },
   chatItem: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -380,18 +379,6 @@ const styles = StyleSheet.create({
       height: 1,
       backgroundColor: 'gray',
       marginHorizontal: 12,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#1a2f30',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
   },
   searchInput: {
     backgroundColor: '#1a2f30',
