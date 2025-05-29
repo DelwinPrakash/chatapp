@@ -65,36 +65,20 @@ export default function ChatScreen({ route }) {
                     filter: `conversation_id=eq.${conversationId}`,
                 },
                 (payload) => {
-
-                    const newMessage = {
-                        _id: payload.new.id, 
-                        text: payload.new.content,
-                        createdAt: DateTime.fromISO(payload.new.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').toFormat('yyyy-MM-dd HH:mm:ss'),
-                        user: {
-                            _id: payload.new.sender_id,
-                            name: payload.new.sender_name || 'Unknown'
-                        }
+                    if( payload.new.conversation_id === conversationId){
+                        fetchMessages();
                     }
-                    setMessages((prev) => [...prev, newMessage]);
-                    console.log('message:', messages);
-                    
-                    // const newMessage = payload.new;
-                    // if (newMessage.conversation_id === conversationId) {
-                    //     setMessages((prev) => {
-                    //         if (prev.some(msg => msg._id === newMessage.id)) return prev;
-
-                    //         return [...prev, {
-                    //             _id: newMessage.id,
-                    //             text: newMessage.content,
-                    //             createdAt: DateTime.fromISO(newMessage.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').toFormat('yyyy-MM-dd HH:mm:ss'),
-                    //             user: {
-                    //                 _id: newMessage.sender_id,
-                    //                 name: newMessage.sender_name || 'Unknown'
-                    //             }
-                    //         }];
-                    //     });
+                    // const newMessage = {
+                    //     _id: payload.new.id, 
+                    //     text: payload.new.content,
+                    //     createdAt: DateTime.fromISO(payload.new.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').toFormat('yyyy-MM-dd HH:mm:ss'),
+                    //     user: {
+                    //         _id: payload.new.sender_id,
+                    //         name: payload.new.sender_name || 'Unknown'
+                    //     }
                     // }
-
+                    // setMessages((prev) => [...prev, newMessage]);
+                    // console.log('messageee:', messages);
                 }
             )
             .subscribe();
@@ -103,7 +87,7 @@ export default function ChatScreen({ route }) {
             supabase.removeChannel(channel);
         };
 
-    }, [messages.length, conversationId]);
+    }, [conversationId]);
 
     if(userLoading){
         return <View style={{flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#1F1A20"}}>
