@@ -30,7 +30,7 @@
 import { useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Pressable } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
 import { ActivityIndicator } from 'react-native';
 import { supabase } from '../lib/supabase';
@@ -45,8 +45,6 @@ export default function Index(){
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // console.log("hello",user);
-
   useEffect(() => {
     if (!user && !userLoading) {
       navigation.replace("auth/index");
@@ -54,8 +52,6 @@ export default function Index(){
 
     if (user) {
       const fetchChats = async () => {
-        // console.log('someone called mehhh')
-
         const { data: viewData, error: viewError } = await supabase
           .from('user_conversations_view')
           .select('*')
@@ -63,7 +59,6 @@ export default function Index(){
           // .order('last_message', { ascending: false });
 
         if(viewError) console.log(viewError);
-        // console.log('View Data:', viewData);
 
         const { data, error } = await supabase
           .from('conversations')
@@ -79,9 +74,6 @@ export default function Index(){
           `)
           .eq('participants.user_id', user.id)
           .order('last_message', { ascending: false });
-
-        // console.log('DATA:', data);
-        // console.log('ERROR:', error);
 
         const combined = viewData.reverse().map((item, index) => ({
             ...item,
@@ -109,7 +101,6 @@ export default function Index(){
           },
           (payload) => {
             fetchChats();
-            // console.log('Realtime payload:', payload);
           }
         )
         .subscribe();
@@ -199,6 +190,7 @@ export default function Index(){
         style={styles.chatItem}
         // onPress={() => navigation.navigate('chat/index', { chatId: item.id })}
         onPress={() => navigation.navigate('chat/[id]', { chatId: item.id })}
+        // onPress={() => router.push('chat/[id]', { chatId: item.id })}
       >
         <View style={styles.avatarContainer}>
           <Image
@@ -354,9 +346,12 @@ const styles = StyleSheet.create({
       marginBottom: 4,
   },
   name: {
-      fontSize: 16,
+      fontSize: 15,
       fontWeight: 'bold',
-      color: "#fff"
+      color: "#fff",
+      // backgroundColor: "red",
+      // flexWrap: 'wrap',
+      // maxWidth: '85%',
   },
   timestamp: {
       fontSize: 12,

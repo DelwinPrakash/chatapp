@@ -15,7 +15,6 @@ export default function Auth() {
 
   const navigation = useNavigation();
   const { user, userLoading } = useAuth();
-  console.log("hello",user);
 
   useEffect(() => {
     if(user){

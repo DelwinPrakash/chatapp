@@ -44,11 +44,16 @@ export default function ChatScreen({ route }) {
                 })).reverse();
                 setMessages(giftedChatMessages);
                 
-                const convoTitle = await supabase
-                    .from('conversations')
-                    .select('title')
-                    .eq('id', conversationId)
-                setTitle(convoTitle.data[0].title || 'Chat');
+                // const convoTitle = await supabase
+                //     .from('conversations')
+                //     .select('title')
+                //     .eq('id', conversationId)
+                const { data: convoTitle } = await supabase
+                    .from('user_conversations_view')
+                    .select('*')
+                    .eq('viewer_id', user.id)
+                    .eq('conversation_id', conversationId)
+                setTitle(convoTitle[0].other_user_name || 'Chat');
             }
         };
 
@@ -134,7 +139,6 @@ export default function ChatScreen({ route }) {
     // }
 
     const onSend = async (newMessages = []) => {
-        console.log(newMessages);
         if(!newMessages || newMessages.length === 0) return;
 
         setIsSending(true);
@@ -151,7 +155,6 @@ export default function ChatScreen({ route }) {
             setIsSending(false);
         }
     }
-    console.log("hiii", messages.length)
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <SafeAreaView style={{flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#1F1A20", borderWidth: 1}}>

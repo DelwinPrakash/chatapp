@@ -11,7 +11,6 @@ export default function Index() {
 
     const { user } = useAuth();
     const navigation = useNavigation();
-    // console.log(navigation);
 
     const handleSearch = async () => {
         if (!searchTerm.trim()) return;
