@@ -29,9 +29,9 @@ export default function ChatScreen({ route }) {
                 .eq('conversation_id', conversationId)
                 .order('created_at', { ascending: true });
 
-            if (error) console.error(error);
+            if (error) console.error("fetchMessages error:",error);
             else {
-                await supabase.from("conversations").update({last_message: data[data.length - 1].created_at}).eq("id", conversationId);
+                await supabase.from("conversations").update({last_message: data[data.length - 1]?.created_at}).eq("id", conversationId);
                 const giftedChatMessages = data.map(msg => ({
                     _id: msg.id, 
                     text: msg.content,

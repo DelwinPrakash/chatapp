@@ -45,7 +45,7 @@ export default function Index(){
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  console.log("hello",user);
+  // console.log("hello",user);
 
   useEffect(() => {
     if (!user && !userLoading) {
@@ -55,6 +55,16 @@ export default function Index(){
     if (user) {
       const fetchChats = async () => {
         // console.log('someone called mehhh')
+
+        const { data: viewData, error: viewError } = await supabase
+          .from('user_conversations_view')
+          .select('*')
+          .eq('viewer_id', user.id)
+          // .order('last_message', { ascending: false });
+
+        if(viewError) console.log(viewError);
+        // console.log('View Data:', viewData);
+
         const { data, error } = await supabase
           .from('conversations')
           .select(`
@@ -70,11 +80,16 @@ export default function Index(){
           .eq('participants.user_id', user.id)
           .order('last_message', { ascending: false });
 
-        console.log('DATA:', data);
-        console.log('ERROR:', error);
+        // console.log('DATA:', data);
+        // console.log('ERROR:', error);
+
+        const combined = viewData.reverse().map((item, index) => ({
+            ...item,
+            ...data[index]
+        }));
 
         if (!error) {
-          setChats(data);
+          setChats(combined);
         }
         setLoading(false);
       };
@@ -178,11 +193,7 @@ export default function Index(){
   //     </View>
   //   </TouchableOpacity>
   // );
-
   const renderItem = ({ item }) => {
-    // console.log("Other Participant:", item);
-    const otherParticipant = item.participants.find(p => p.user_id !== user.id);
-    
     return (
       <TouchableOpacity 
         style={styles.chatItem}
@@ -191,21 +202,21 @@ export default function Index(){
       >
         <View style={styles.avatarContainer}>
           <Image
-            source={{ uri: otherParticipant?.avatar_url || 'https://picsum.photos/200/300?random' }}
+            source={{ uri: `https://picsum.photos/200/300?random${item.other_user_id}` }}
             style={styles.avatar}
           />
-          {otherParticipant?.online && <View style={styles.onlineIndicator} />}
+          {item?.online && <View style={styles.onlineIndicator} />}
         </View>
 
         <View style={styles.chatContent}>
           <View style={styles.chatHeader}>
             <Text style={styles.name}>
-              {item.title || otherParticipant?.username || 'Unknown'}
+              {item.other_user_name || 'Unknown'}
             </Text>
-            <Text style={styles.timestamp}>
+            {item.messages[item.messages.length-1]?.created_at && <Text style={styles.timestamp}>
               {/* {item.messages[item.messages.length-1]?.created_at.replace("T", " ").split(".")[0]} */}
               {DateTime.fromISO(item.messages[item.messages.length-1]?.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').hasSame(DateTime.now().setZone('Asia/Kolkata'), 'day') ? DateTime.fromISO(item.messages[item.messages.length-1]?.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').toFormat('HH:mm') : DateTime.fromISO(item.messages[item.messages.length-1]?.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').toFormat('MMM dd')}
-            </Text>
+            </Text>}
           </View>
           <View style={styles.messageContainer}>
             <Text 
@@ -232,7 +243,7 @@ export default function Index(){
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>ChatApp</Text>
-          <Pressable onPress={() => navigation.navigate('chat/new')}>
+          <Pressable onPress={() => navigation.navigate('new/index')}>
             <Ionicons name="add" size={24} color="white" />
           </Pressable>
         </View>
