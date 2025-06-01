@@ -56,7 +56,7 @@ export default function Index(){
           .from('user_conversations_view')
           .select('*')
           .eq('viewer_id', user.id)
-          // .order('last_message', { ascending: false });
+          .order('last_message', { ascending: false });
 
         if(viewError) console.log(viewError);
 
@@ -75,11 +75,13 @@ export default function Index(){
           .eq('participants.user_id', user.id)
           .order('last_message', { ascending: false });
 
-        const combined = viewData.reverse().map((item, index) => ({
+        const combined = viewData?.map((item, index) => ({
             ...item,
             ...data[index]
         }));
 
+        console.log("combined:", combined);
+        
         if (!error) {
           setChats(combined);
         }
@@ -116,7 +118,7 @@ export default function Index(){
           <ActivityIndicator size="large" color="#00f0ff" />
       </View>
   }
-  
+  // console.log("chats:", chats);
   // const mokeChats = [
   //   {
   //     id: '1',
@@ -186,11 +188,10 @@ export default function Index(){
   // );
   const renderItem = ({ item }) => {
     return (
-      <TouchableOpacity 
+      (item?.last_message && <TouchableOpacity 
         style={styles.chatItem}
         // onPress={() => navigation.navigate('chat/index', { chatId: item.id })}
         onPress={() => navigation.navigate('chat/[id]', { chatId: item.id })}
-        // onPress={() => router.push('chat/[id]', { chatId: item.id })}
       >
         <View style={styles.avatarContainer}>
           <Image
@@ -225,7 +226,7 @@ export default function Index(){
             )}
           </View>
         </View>
-      </TouchableOpacity>
+      </TouchableOpacity>)
     );
   };
 

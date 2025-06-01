@@ -23,8 +23,7 @@ export default function Index() {
                 // .or(`username.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`)
                 .or(`username.ilike.%${searchTerm}%`)
                 .limit(20);
-            console.log('term', searchTerm);
-            console.log('Search results:', data);
+
             if (error) throw error;
             setSearchResults(data || []);
         } catch (error) {
@@ -49,7 +48,6 @@ export default function Index() {
             // if(existingChatError) throw existingChatError;
     
             const conversationIds = myConversations.map(p => p.conversation_id)
-            console.log("conversationIds", conversationIds);
     
             const { data: existingChat } = await supabase
                 .from('participants')
@@ -58,8 +56,6 @@ export default function Index() {
                 .eq('user_id', userId)
                 .maybeSingle();
 
-            console.log('Existing chat:', existingChat);
-    
             if (existingChat) {
                 navigation.navigate('chat/[id]', { chatId: existingChat.conversation_id });
                 return;
