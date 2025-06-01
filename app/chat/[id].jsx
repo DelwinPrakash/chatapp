@@ -18,7 +18,7 @@ export default function ChatScreen({ route }) {
     const [isSending, setIsSending] = useState(false);
     
     useLayoutEffect(() => {
-        navigation.setOptions({title: title || 'Chat', headerStyle: {backgroundColor: '#3e787a'}});
+        navigation.setOptions({title: title || 'Chat'});
     }, [navigation, title]);
 
     useEffect(() => {
@@ -118,6 +118,9 @@ export default function ChatScreen({ route }) {
             textStyle={{
             left:{
                 color: "#fff",
+            },
+            right:{
+                color: "#fff",
             }
             }}
             containerStyle={{
@@ -157,7 +160,7 @@ export default function ChatScreen({ route }) {
     }
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-            <SafeAreaView style={{flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#1F1A20", borderWidth: 1}}>
+            <SafeAreaView style={{flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#262424", borderWidth: 1}}>
                 <StatusBar barStyle={"light-content"} backgroundColor={"#123456"}/>
                 <View style={{flex: 1, width: "100%"}}>
                     <GiftedChat

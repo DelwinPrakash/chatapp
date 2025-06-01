@@ -90,7 +90,7 @@ export default function Index() {
     };
 
     return (
-        <View style={{ flex: 1, padding: 16, backgroundColor: '#233a3b'}}>
+        <View style={{ flex: 1, padding: 16, backgroundColor: '#262424'}}>
             <TextInput
                 placeholder="Search by username or email"
                 value={searchTerm}
@@ -126,7 +126,7 @@ export default function Index() {
                         >
                             <View style={{ marginRight: 12 }}>
                                 <Image
-                                    source={{ uri: 'https://picsum.photos/200/300?random' }}
+                                    source={{ uri: `https://picsum.photos/200/300?${item.id}` }}
                                     style={{ 
                                         width: 40, 
                                         height: 40, 

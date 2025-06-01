@@ -80,7 +80,7 @@ export default function Index(){
             ...data[index]
         }));
 
-        console.log("combined:", combined);
+        // console.log("combined:", combined);
         
         if (!error) {
           setChats(combined);
@@ -286,7 +286,7 @@ export default function Index(){
 const styles = StyleSheet.create({
   container: {
       flex: 1,
-      backgroundColor: '#233a3b',
+      backgroundColor: '#262424',
   },
   center: {
       justifyContent: "center",
@@ -298,12 +298,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#1a2f30',
+    backgroundColor: '#171616'
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: 'white',
+    color: '#eee5da',
   },
   chatItem: {
       flexDirection: 'row',
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
   name: {
       fontSize: 15,
       fontWeight: 'bold',
-      color: "#fff",
+      color: "#eee5da",
       // backgroundColor: "red",
       // flexWrap: 'wrap',
       // maxWidth: '85%',
@@ -388,10 +388,12 @@ const styles = StyleSheet.create({
       marginHorizontal: 12,
   },
   searchInput: {
-    backgroundColor: '#1a2f30',
+    // backgroundColor: '#262424',
     color: 'white',
     padding: 12,
     margin: 16,
+    borderWidth: 1,
+    borderColor: '#eee5da',
     borderRadius: 8,
   },
   loader: {
