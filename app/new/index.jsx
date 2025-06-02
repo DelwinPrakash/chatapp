@@ -21,7 +21,9 @@ export default function Index() {
                 .from('profiles')
                 .select('id, username, avatar_url')
                 // .or(`username.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`)
-                .or(`username.ilike.%${searchTerm}%`)
+                // .or(`username.ilike.%${searchTerm}%`)
+                .ilike('username', `%${searchTerm}%`)
+                .neq('id', user.id)
                 .limit(20);
 
             if (error) throw error;
@@ -92,7 +94,7 @@ export default function Index() {
     return (
         <View style={{ flex: 1, padding: 16, backgroundColor: '#262424'}}>
             <TextInput
-                placeholder="Search by username or email"
+                placeholder="Search by email"
                 value={searchTerm}
                 onChangeText={setSearchTerm}
                 onSubmitEditing={handleSearch}
