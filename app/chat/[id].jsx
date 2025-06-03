@@ -1,7 +1,7 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { View, Text, FlatList, KeyboardAvoidingView, Platform, ActivityIndicator, Image } from 'react-native';
 import { supabase } from '../../lib/supabase';
-import { useLocalSearchParams, useNavigation } from 'expo-router';
+import { useLocalSearchParams, useNavigation, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { GiftedChat, Bubble, Avatar } from 'react-native-gifted-chat';
@@ -20,6 +20,41 @@ export default function ChatScreen({ route }) {
     useLayoutEffect(() => {
         navigation.setOptions({title: title || 'Chat'});
     }, [navigation, title]);
+
+    useFocusEffect(
+        React.useCallback(( ) => {
+            const markMessagesAsRead = async () => {
+            //     if(!user.id) return;
+
+            //     const { data: unreadMessages } = await supabase
+            //         .from('messages')
+            //         .select('id')
+            //         .eq('conversation_id', conversationId)
+            //         // .not('message_reads.user_id', 'eq', user.id);
+            //         .neq('sender_id', user.id);
+                    
+            //     if(unreadMessages?.length > 0){
+            //         const reads = unreadMessages.map(msg => ({
+            //             message_id: msg.id,
+            //             user_id: user.id
+            //         }))
+
+            //         await supabase.from("message_reads").upsert(reads);
+            //     }
+            // }
+            // markMessagesAsRead();
+
+                if (!user?.id) return;
+
+                await supabase
+                    .from('participants')
+                    .update({ last_read_at: new Date().toISOString() })
+                    .eq('conversation_id', conversationId)
+                    .eq('user_id', user.id);
+            }
+            markMessagesAsRead();
+        }, [conversationId, user?.id])
+    );
 
     useEffect(() => {
         const fetchMessages = async () => {

@@ -52,13 +52,36 @@ export default function Index(){
 
     if (user) {
       const fetchChats = async () => {
-        const { data: viewData, error: viewError } = await supabase
+        const { data: viewData, error: viewError } = await supabase     //todo: unread messages counting problem, db
           .from('user_conversations_view')
-          .select('*')
+          .select(`
+            *,
+            unread_messages: messages!conversation_id(
+              id,
+              created_at
+            ).filter(
+              created_at > (
+                SELECT last_read_at 
+                FROM participants 
+                WHERE conversation_id = user_conversations_view.conversation_id 
+              )
+            )
+          `)
           .eq('viewer_id', user.id)
           .order('last_message', { ascending: false });
+// .filter(
+//               created_at > (
+//                 SELECT last_read_at 
+//                 FROM participants 
+//                 WHERE conversation_id = user_conversations_view.conversation_id 
+//                 AND user_id = ${user.id}
+//                 LIMIT 1
+//               )
+//               AND sender_id != ${user.id}
+//             )
 
         if(viewError) console.log(viewError);
+        console.log("viewData:", viewData);
 
         const { data, error } = await supabase
           .from('conversations')
@@ -83,7 +106,11 @@ export default function Index(){
         // console.log("combined:", combined);
         
         if (!error) {
-          setChats(combined);
+          setChats(combined.map(convo => ({
+            ...convo,
+            unreadCount: convo.unread_messages?.length || 0
+          })));
+          console.log("chats:", combined);
         }
         setLoading(false);
       };
@@ -106,12 +133,28 @@ export default function Index(){
           }
         )
         .subscribe();
+      
+      const channel2 = supabase
+        .channel('unread_updates')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'message_reads',
+            filter: `user_id=eq.${user.id}`
+          },
+          () => fetchChats()
+        ).subscribe();
 
       return () => {
         supabase.removeChannel(channel);
+        supabase.removeChannel(channel2);
       };
     }
   }, [user, userLoading])
+
+  // console.log("chats:", chats);
 
   if(userLoading){
       return <View style={[styles.container, styles.center]}>
@@ -203,9 +246,11 @@ export default function Index(){
 
         <View style={styles.chatContent}>
           <View style={styles.chatHeader}>
-            <Text style={styles.name}>
-              {item.other_user_name || 'Unknown'}
-            </Text>
+            <View style={{maxWidth: '80%'}}>
+              <Text style={styles.name}>
+                {item.other_user_name || 'Unknown'}
+              </Text>
+            </View>
             {item.messages[item.messages.length-1]?.created_at && <Text style={styles.timestamp}>
               {/* {item.messages[item.messages.length-1]?.created_at.replace("T", " ").split(".")[0]} */}
               {DateTime.fromISO(item.messages[item.messages.length-1]?.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').hasSame(DateTime.now().setZone('Asia/Kolkata'), 'day') ? DateTime.fromISO(item.messages[item.messages.length-1]?.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').toFormat('HH:mm') : DateTime.fromISO(item.messages[item.messages.length-1]?.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').toFormat('MMM dd')}
