@@ -18,7 +18,7 @@ export default function Auth() {
 
   useEffect(() => {
     if(user){
-      navigation.replace("index");
+      navigation.replace("(tabs)");
     }
   }, [user, userLoading])
   
@@ -40,7 +40,7 @@ export default function Auth() {
       Alert.alert(error.message)
       setError(error.message)
     }else{
-      navigation.replace("index");
+      navigation.replace("(tabs)");
     }
     setLoading(false)
   }
