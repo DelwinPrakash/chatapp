@@ -52,36 +52,25 @@ export default function Index(){
 
     if (user) {
       const fetchChats = async () => {
-        const { data: viewData, error: viewError } = await supabase     //todo: unread messages counting problem, db
+        const { data: viewData, error: viewError } = await supabase
           .from('user_conversations_view')
-          .select(`
-            *,
-            unread_messages: messages!conversation_id(
-              id,
-              created_at
-            ).filter(
-              created_at > (
-                SELECT last_read_at 
-                FROM participants 
-                WHERE conversation_id = user_conversations_view.conversation_id 
-              )
-            )
-          `)
+          .select(`*`)
           .eq('viewer_id', user.id)
           .order('last_message', { ascending: false });
-// .filter(
-//               created_at > (
-//                 SELECT last_read_at 
-//                 FROM participants 
-//                 WHERE conversation_id = user_conversations_view.conversation_id 
-//                 AND user_id = ${user.id}
-//                 LIMIT 1
-//               )
-//               AND sender_id != ${user.id}
-//             )
+
+        const { data: unreadCount } = await supabase
+          .rpc('get_unread_message_counts', { uid: user.id })
+
+        const unreadMap = new Map(
+            unreadCount.map(item => [item.conversation_id, item.unread_count])
+        );
+
+        const mergedData = viewData.map(convo => ({
+            ...convo,
+            unread_count: unreadMap.get(convo.conversation_id) || 0
+        }));
 
         if(viewError) console.log(viewError);
-        // console.log("viewData:", viewData);
 
         const { data, error } = await supabase
           .from('conversations')
@@ -98,19 +87,16 @@ export default function Index(){
           .eq('participants.user_id', user.id)
           .order('last_message', { ascending: false });
 
-        const combined = viewData?.map((item, index) => ({
+        const combined = mergedData?.map((item, index) => ({
             ...item,
             ...data[index]
         }));
 
-        // console.log("combined:", combined);
-        
         if (!error) {
           setChats(combined.map(convo => ({
             ...convo,
             unreadCount: convo.unread_messages?.length || 0
           })));
-          // console.log("chats:", combined);
         }
         setLoading(false);
       };
@@ -264,9 +250,9 @@ export default function Index(){
             >
               {item.messages[item.messages?.length-1]?.content || 'No messages yet'}
             </Text>
-            {item.unreadCount > 0 && (
+            {item.unread_count > 0 && (
               <View style={styles.unreadBadge}>
-                <Text style={styles.unreadText}>{item.unreadCount}</Text>
+                <Text style={styles.unreadText}>{item.unread_count}</Text>
               </View>
             )}
           </View>
