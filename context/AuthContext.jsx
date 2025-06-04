@@ -20,7 +20,11 @@ export function AuthProvider({ children }){
         return () => subscription.unsubscribe();
     }, [])
 
-    return <AuthContext.Provider value={{ user, userLoading }}>{children}</AuthContext.Provider>
+    const logout = async () => {
+        const { error } = await supabase.auth.signOut();
+    } 
+
+    return <AuthContext.Provider value={{ user, userLoading, logout }}>{children}</AuthContext.Provider>
 }
 
 export const useAuth = () => useContext(AuthContext);

@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
 import { Platform } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function TabLayout() {
     return(
@@ -8,6 +9,7 @@ export default function TabLayout() {
             headerShown: false,
             // tabBarButton: HapticTab,
             // tabBarBackground: TabBarBackground,
+            tabBarLabel: () => false,
             tabBarStyle: Platform.select({
                 ios: {
                     position: 'absolute',
@@ -19,12 +21,16 @@ export default function TabLayout() {
                     paddingBottom: 10,
                 },
             }),
+            tabBarItemStyle: {
+                paddingTop: 10,
+                paddingBottom: 10,
+            }
         }}>
             <Tabs.Screen
                 name="index"
                 options={{
-                    title: "Chat",
-                    // tabBarIcon: ({ color }) => <TabIcon name="chatbubble-ellipses" color={color} />,
+                    // tabBarIcon: ({ color }) => <Ionicons name="chatbubble-ellipses" color={color} />,
+                    tabBarIcon: ({ focused }) => <Ionicons name="chatbubble-ellipses" size={24} color={focused ? '#3e787a' : '#aaa'} />,
                 }}
             />
             {/* <Tabs.Screen
@@ -37,8 +43,8 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="profile"
                 options={{
-                    title: "Profile",
-                    // tabBarIcon: ({ color }) => <TabIcon name="person" color={color} />,
+                    // title: "Profile",
+                    tabBarIcon: ({ focused }) => <Ionicons name="person" size={24} color={focused ? '#3e787a' : '#aaa'} />,
                 }}
             />
         </Tabs>
