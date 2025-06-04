@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from 'expo-router';
 
 export default function Profile() {
-    const { user, logout } = useAuth();
+    const { user, logout, userLoading } = useAuth();
     const navigation = useNavigation();
 
     const [profile, setProfile] = useState(null);
@@ -15,6 +15,10 @@ export default function Profile() {
     const [editMode, setEditMode] = useState(false);
 
     useEffect(() => {
+        if (!user && !userLoading){
+            navigation.replace("auth/index");
+        }
+
         const fetchProfile = async () => {
             if (!user) return;
             
@@ -30,7 +34,7 @@ export default function Profile() {
         };
         
         fetchProfile();
-    }, [user]);
+    }, [user, userLoading]);
 
     const handleSignOut = () => {
         logout();
