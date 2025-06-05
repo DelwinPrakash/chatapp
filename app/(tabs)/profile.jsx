@@ -202,11 +202,11 @@ const styles = StyleSheet.create({
         alignItems: "center",
         textAlign: "center"
     },
-    profileContainer: {
+    // profileContainer: {
         // alignItems: 'center',
         // marginBottom: 30,
         // backgroundColor: '#171616',
-    },
+    // },
     avatarContainer: {
         position: 'relative',
         marginTop: 16,

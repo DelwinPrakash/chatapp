@@ -41,13 +41,6 @@ export default function Index() {
                 .from('participants')
                 .select('conversation_id')
                 .eq('user_id', user.id)
-                // .contains('conversation_id', {
-                //     participants: { user_id: userId }
-                // })
-                // .maybeSingle();
-    
-            // console.log("my all convo", myConversations);
-            // if(existingChatError) throw existingChatError;
     
             const conversationIds = myConversations.map(p => p.conversation_id)
     

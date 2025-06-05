@@ -1,10 +1,10 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { View, Text, FlatList, KeyboardAvoidingView, Platform, ActivityIndicator, Image } from 'react-native';
+import { View, KeyboardAvoidingView, Platform, ActivityIndicator, Image } from 'react-native';
 import { supabase } from '../../lib/supabase';
 import { useLocalSearchParams, useNavigation, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { GiftedChat, Bubble, Avatar } from 'react-native-gifted-chat';
+import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import { useAuth } from '../../context/AuthContext';
 import { sendMessage } from '../../lib/message';
 import { DateTime } from 'luxon';
@@ -79,10 +79,6 @@ export default function ChatScreen({ route }) {
                 })).reverse();
                 setMessages(giftedChatMessages);
                 
-                // const convoTitle = await supabase
-                //     .from('conversations')
-                //     .select('title')
-                //     .eq('id', conversationId)
                 const { data: convoTitle } = await supabase
                     .from('user_conversations_view')
                     .select('*')

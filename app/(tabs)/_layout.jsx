@@ -29,7 +29,6 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="index"
                 options={{
-                    // tabBarIcon: ({ color }) => <Ionicons name="chatbubble-ellipses" color={color} />,
                     tabBarIcon: ({ focused }) => <Ionicons name="chatbubble-ellipses" size={24} color={focused ? '#3e787a' : '#aaa'} />,
                 }}
             />
@@ -43,7 +42,6 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="profile"
                 options={{
-                    // title: "Profile",
                     tabBarIcon: ({ focused }) => <Ionicons name="person" size={24} color={focused ? '#3e787a' : '#aaa'} />,
                 }}
             />
