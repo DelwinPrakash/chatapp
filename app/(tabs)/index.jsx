@@ -1,36 +1,6 @@
-// import { Link } from 'expo-router';
-// import { View, Text, Pressable, StyleSheet } from 'react-native';
-
-// function createStyles(){
-//     return StyleSheet.create({
-//         center: {
-//             justifyContent: "center",
-//             alignItems: "center",
-//             textAlign: "center"
-//         }
-//     })
-// }
-
-// export default function Index(){
-//     const styles = createStyles();
-//     return(
-//         <View style={[{flex: 1, backgroundColor: "#1F1A30"}, styles.center]}>
-//             {/* <Text style={{color: "white"}}>This is the Home page!</Text> */}
-//             <View>
-//                 <Link href="/chat" asChild>
-//                     <Pressable>
-//                         <Text style={[{width:120, backgroundColor: "#826730", padding: 10, marginTop: 10, color: "white", borderRadius: 20}, styles.center]}>Go to Chat</Text>
-//                     </Pressable>
-//                 </Link>
-//             </View>
-//         </View>
-//     );
-// }
-
 import { useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Pressable } from 'react-native';
-import { Link, router } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import { ActivityIndicator } from 'react-native';
 import { supabase } from '../../lib/supabase';
@@ -119,102 +89,19 @@ export default function Index(){
           }
         )
         .subscribe();
-      
-      const channel2 = supabase
-        .channel('unread_updates')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'message_reads',
-            filter: `user_id=eq.${user.id}`
-          },
-          () => fetchChats()
-        ).subscribe();
-
+    
       return () => {
         supabase.removeChannel(channel);
-        supabase.removeChannel(channel2);
       };
     }
   }, [user, userLoading])
-
-  // console.log("chats:", chats);
 
   if(userLoading){
       return <View style={[styles.container, styles.center]}>
           <ActivityIndicator size="large" color="#00f0ff" />
       </View>
   }
-  // console.log("chats:", chats);
-  // const mokeChats = [
-  //   {
-  //     id: '1',
-  //     name: 'John Doe',
-  //     lastMessage: 'Hey, how are you?',
-  //     timestamp: '10:30 AM',
-  //     unreadCount: 2,
-  //     online: true,
-  //   },
-  //   {
-  //     id: '2',
-  //     name: 'Jane Smith',
-  //     lastMessage: 'See you tomorrow!',
-  //     timestamp: '9:45 AM',
-  //     unreadCount: 0,
-  //     online: false,
-  //   },
-  //   {
-  //     id: '3',
-  //     name: 'Mike Johnson',
-  //     lastMessage: 'Thanks for the help!',
-  //     timestamp: 'Yesterday',
-  //     unreadCount: 1,
-  //     online: true,
-  //   },
-  // ];
 
-
-  // const renderItem = ({ item }) => (
-  //   <TouchableOpacity 
-  //     style={styles.chatItem}
-  //     onPress={() => navigation.navigate('chat/index', { chatId: item.id })}      //TODO
-  //   >
-  //     <View style={styles.avatarContainer}>
-  //       <View style={styles.avatar}>
-  //         {/* You can replace this with actual image */}
-  //         <Image
-  //           source={`https://picsum.photos/200/300?random=${item.id}`}
-  //           style={{ width: 50, height: 50, borderRadius: 25 }}
-  //         />
-  //         {/* <Text style={styles.avatarText}>{item.name[0]}</Text> */}
-  //       </View>
-  //       {item.online && <View style={styles.onlineIndicator} />}
-  //     </View>
-
-  //     <View style={styles.chatContent}>
-  //       <View style={styles.chatHeader}>
-  //         <Text style={styles.name}>{item.name}</Text>
-  //         <Text style={styles.timestamp}>{item.timestamp}</Text>
-  //       </View>
-  //       <View style={styles.messageContainer}>
-  //         <Text 
-  //           style={styles.lastMessage}
-  //           numberOfLines={1}
-  //           ellipsizeMode="tail"
-  //         >
-  //           {item.lastMessage}
-  //         </Text>
-  //         {item.unreadCount > 0 && (
-  //           <View style={styles.unreadBadge}>
-  //             <Text style={styles.unreadText}>{item.unreadCount}</Text>
-  //           </View>
-  //         )}
-  //       </View>
-  //     </View>
-  //   </TouchableOpacity>
-  // );
   const renderItem = ({ item }) => {
     return (
       (item?.last_message && <TouchableOpacity 
@@ -244,7 +131,7 @@ export default function Index(){
           </View>
           <View style={styles.messageContainer}>
             <Text 
-              style={styles.lastMessage}
+              style={[styles.lastMessage, {fontWeight: item.unread_count ? "bold" : "regular", color: item.unread_count ? "#fff" : "#aaa"}]}
               numberOfLines={1}
               ellipsizeMode="tail"
             >
@@ -263,7 +150,6 @@ export default function Index(){
 
   return (
     <View style={styles.container}>
-
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>ChatApp</Text>
@@ -291,25 +177,7 @@ export default function Index(){
             ItemSeparatorComponent={() => <View style={styles.separator} />}
           />
         )}
-      </View>
-
-      {/* <FlatList
-        data={mokeChats}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-      /> */}
-        {/* <View style={[styles.center, {flex: 1}]}>
-            <Text style={{color: "white"}}>This is the Home page!</Text>
-            <View>
-                <Link href="/chat" asChild>
-                    <Pressable>
-                        <Text style={[{width:120, backgroundColor: "#826730", padding: 10, marginTop: 10, color: "white", borderRadius: 20}, styles.center]}>Go to Chat</Text>
-                    </Pressable>
-                </Link>
-            </View>
-        </View> */}
-        
+      </View> 
     </View>
   );
 };
@@ -354,11 +222,6 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       alignItems: 'center',
   },
-  // avatarText: {
-  //     color: 'white',
-  //     fontSize: 20,
-  //     fontWeight: 'bold',
-  // },
   onlineIndicator: {
       width: 12,
       height: 12,
@@ -397,14 +260,14 @@ const styles = StyleSheet.create({
   },
   lastMessage: {
       flex: 1,
-      color: '#aaa',
+      // color: '#aaa',
       marginRight: 8,
   },
   unreadBadge: {
       backgroundColor: '#007AFF',
       borderRadius: 12,
-      minWidth: 24,
-      height: 24,
+      minWidth: 22,
+      height: 22,
       justifyContent: 'center',
       alignItems: 'center',
   },
