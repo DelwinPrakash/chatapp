@@ -9,7 +9,7 @@ import { useAuth } from '../../context/AuthContext';
 import { sendMessage } from '../../lib/message';
 import { DateTime } from 'luxon';
 
-export default function ChatScreen({ route }) {
+export default function ChatScreen() {
     const navigation = useNavigation();
     const { chatId: conversationId } =useLocalSearchParams();
     const { user, userLoading } = useAuth();

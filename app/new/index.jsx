@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, TextInput, FlatList, Pressable, Text, Image, Alert } from 'react-native';
+import { View, TextInput, FlatList, Pressable, Text, Image } from 'react-native';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from 'expo-router';
