@@ -1,16 +1,17 @@
 import { useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Pressable } from 'react-native';
-import { useAuth } from '../../context/AuthContext';
-import { ActivityIndicator } from 'react-native';
-import { supabase } from '../../lib/supabase';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabase';
 import { TextInput } from 'react-native-gesture-handler';
 import { DateTime } from 'luxon';
+import CustomLoader from "@/components/CustomLoader"
+import { useRouter } from 'expo-router';
 
 export default function Index(){
   const navigation = useNavigation();
   const { user, userLoading } = useAuth();
+  const router = useRouter();
 
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -82,7 +83,6 @@ export default function Index(){
             event: '*',
             schema: 'public',
             table: 'conversations',  
-            // filter: `participants.user_id=eq.${user.id}`
           },
           (payload) => {
             fetchChats();
@@ -97,18 +97,18 @@ export default function Index(){
   }, [user, userLoading])
 
   if(userLoading){
-      return <View style={[styles.container, styles.center]}>
-          <ActivityIndicator size="large" color="#00f0ff" />
-      </View>
+      return (
+        <CustomLoader/>
+      )
   }
 
   const renderItem = ({ item }) => {
     return (
       (item?.last_message && <TouchableOpacity 
         style={styles.chatItem}
-        // onPress={() => navigation.navigate('chat/index', { chatId: item.id })}
-        onPress={() => navigation.navigate('chat/[id]', { chatId: item.id })}
-      >
+        onPress={() => router.push({pathname: 'chat/[id]', params: {id: item.id}})}
+        
+        >
         <View style={styles.avatarContainer}>
           <Image
             source={{ uri: `https://picsum.photos/200/300?random${item.other_user_id}` }}
@@ -125,7 +125,6 @@ export default function Index(){
               </Text>
             </View>
             {item.messages[item.messages.length-1]?.created_at && <Text style={styles.timestamp}>
-              {/* {item.messages[item.messages.length-1]?.created_at.replace("T", " ").split(".")[0]} */}
               {DateTime.fromISO(item.messages[item.messages.length-1]?.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').hasSame(DateTime.now().setZone('Asia/Kolkata'), 'day') ? DateTime.fromISO(item.messages[item.messages.length-1]?.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').toFormat('HH:mm') : DateTime.fromISO(item.messages[item.messages.length-1]?.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').toFormat('MMM dd')}
             </Text>}
           </View>
@@ -151,12 +150,12 @@ export default function Index(){
   return (
     <View style={styles.container}>
       <View style={styles.container}>
-        <View style={styles.header}>
+        {/* <View style={styles.header}>
           <Text style={styles.headerTitle}>ChatApp</Text>
           <Pressable onPress={() => navigation.navigate('new/index')}>
             <Ionicons name="add" size={24} color="white" />
           </Pressable>
-        </View>
+        </View> */}
         
         <TextInput
           style={styles.searchInput}
@@ -165,7 +164,7 @@ export default function Index(){
         />
         
         {loading ? (
-          <ActivityIndicator size="large" style={styles.loader} />
+          <CustomLoader/>
         ) : (
           <FlatList
             data={chats}

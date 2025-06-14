@@ -1,17 +1,18 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { View, KeyboardAvoidingView, Platform, ActivityIndicator, Image } from 'react-native';
-import { supabase } from '../../lib/supabase';
+import { View, KeyboardAvoidingView, Platform } from 'react-native';
+import { supabase } from '@/lib/supabase';
 import { useLocalSearchParams, useNavigation, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
-import { useAuth } from '../../context/AuthContext';
-import { sendMessage } from '../../lib/message';
+import { useAuth } from '@/context/AuthContext';
+import { sendMessage } from '@/lib/message';
 import { DateTime } from 'luxon';
+import CustomLoader from "@/components/CustomLoader"
 
-export default function ChatScreen() {
+const ChatPage = () => {
     const navigation = useNavigation();
-    const { chatId: conversationId } =useLocalSearchParams();
+    const { id: conversationId } = useLocalSearchParams();
     const { user, userLoading } = useAuth();
     const [messages, setMessages] = useState([]);
     const [title, setTitle] = useState('');
@@ -24,26 +25,6 @@ export default function ChatScreen() {
     useFocusEffect(
         React.useCallback(( ) => {
             const markMessagesAsRead = async () => {
-            //     if(!user.id) return;
-
-            //     const { data: unreadMessages } = await supabase
-            //         .from('messages')
-            //         .select('id')
-            //         .eq('conversation_id', conversationId)
-            //         // .not('message_reads.user_id', 'eq', user.id);
-            //         .neq('sender_id', user.id);
-                    
-            //     if(unreadMessages?.length > 0){
-            //         const reads = unreadMessages.map(msg => ({
-            //             message_id: msg.id,
-            //             user_id: user.id
-            //         }))
-
-            //         await supabase.from("message_reads").upsert(reads);
-            //     }
-            // }
-            // markMessagesAsRead();
-
                 if (!user?.id) return;
 
                 await supabase
@@ -70,7 +51,6 @@ export default function ChatScreen() {
                 const giftedChatMessages = data.map(msg => ({
                     _id: msg.id, 
                     text: msg.content,
-                    // createdAt: new Date(msg.created_at),
                     createdAt: DateTime.fromISO(msg.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').toFormat('yyyy-MM-dd HH:mm:ss'),
                     user: {
                         _id: msg.sender_id,
@@ -90,7 +70,6 @@ export default function ChatScreen() {
 
         fetchMessages();
 
-        // Subscribe to new messages
         const channel = supabase
             .channel('messages')
             .on(
@@ -105,17 +84,6 @@ export default function ChatScreen() {
                     if( payload.new.conversation_id === conversationId){
                         fetchMessages();
                     }
-                    // const newMessage = {
-                    //     _id: payload.new.id, 
-                    //     text: payload.new.content,
-                    //     createdAt: DateTime.fromISO(payload.new.created_at, { zone: 'utc' }).setZone('Asia/Kolkata').toFormat('yyyy-MM-dd HH:mm:ss'),
-                    //     user: {
-                    //         _id: payload.new.sender_id,
-                    //         name: payload.new.sender_name || 'Unknown'
-                    //     }
-                    // }
-                    // setMessages((prev) => [...prev, newMessage]);
-                    // console.log('messageee:', messages);
                 }
             )
             .subscribe();
@@ -127,9 +95,9 @@ export default function ChatScreen() {
     }, [conversationId]);
 
     if(userLoading){
-        return <View style={{flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#1F1A20"}}>
-            <ActivityIndicator size="large" color="#00f0ff" />
-        </View>
+        return (
+            <CustomLoader/>
+        )
     }
 
     const renderBubble = (props) => {
@@ -162,15 +130,6 @@ export default function ChatScreen() {
             />
         );
     }
-    
-    // const renderAvatar = (props) => {
-    //     return (
-    //         <Image
-    //             source={{uri: props.currentMessage.user.avatar}}
-    //             style={{ width: 40, height: 40, borderRadius: 20, marginBottom: 5 }}
-    //         />
-    //     );
-    // }
 
     const onSend = async (newMessages = []) => {
         if(!newMessages || newMessages.length === 0) return;
@@ -191,8 +150,7 @@ export default function ChatScreen() {
     }
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-            <SafeAreaView style={{flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#262424", borderWidth: 1}}>
-                <StatusBar barStyle={"light-content"} backgroundColor={"#123456"}/>
+            <SafeAreaView style={{flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#262424"}}>
                 <View style={{flex: 1, width: "100%"}}>
                     <GiftedChat
                         messages={messages}
@@ -210,3 +168,5 @@ export default function ChatScreen() {
         </KeyboardAvoidingView>
     );
 }
+
+export default ChatPage;

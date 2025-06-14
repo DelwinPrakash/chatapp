@@ -6,7 +6,7 @@ export default {
     slug: "chatapp",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./assets/images/icon.png",
+    icon: "./assets/images/icon1.png",
     scheme: "myapp",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
@@ -15,11 +15,14 @@ export default {
     },
     extra: {
       supabaseUrl: process.env.SUPABASE_URL,
-      supabaseAnonKey: process.env.SUPABASE_ANON_KEY
+      supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
+      "eas": {
+        "projectId": "a5923275-206f-46eb-a8fc-88676278c791"
+      }
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/images/icon.png",
+        foregroundImage: "./assets/images/icon1.png",
         backgroundColor: "#000000"
       },
       package: "com.delwin77.chatapp"
@@ -27,14 +30,14 @@ export default {
     web: {
       bundler: "metro",
       output: "static",
-      favicon: "./assets/images/icon.png"
+      favicon: "./assets/images/icon1.png"
     },
     plugins: [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          image: "./assets/images/icon.png",
+          image: "./assets/images/splash-icon.png",
           imageWidth: 200,
           resizeMode: "contain",
           backgroundColor: "#000000"

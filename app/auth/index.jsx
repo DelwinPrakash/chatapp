@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { supabase } from "../../lib/supabase";
-import { ActivityIndicator } from "react-native-web";
-import { useAuth } from "../../context/AuthContext";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/context/AuthContext";
+import CustomLoader from "@/components/CustomLoader"
 
 export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
@@ -23,9 +23,7 @@ export default function Auth() {
   }, [user, userLoading])
   
   if(userLoading){
-    return <View style={styles.container}>
-      <ActivityIndicator size="large" color="#00f0ff" />
-    </View>
+    return <CustomLoader/>
   }
 
   async function signInWithEmail() {
@@ -109,12 +107,13 @@ export default function Auth() {
               <Text style={{ color: "red" }}>{error}</Text>
           </View>
 
-          <TouchableOpacity style={styles.loginButton}
+          <TouchableOpacity style={[styles.loginButton, {backgroundColor: loading ? "#262424" : "#007AFF"}]}
             onPress={() => login ? signInWithEmail() : signUpWithEmail()}
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator size="small" color="#fff" />
+              // <ActivityIndicator size="small" color="#fff" />
+              <CustomLoader/>
             ) : (
               <Text style={styles.loginButtonText}>{login ? "Log in" : "Sign Up"}</Text>
             )}
@@ -134,6 +133,11 @@ export default function Auth() {
     </ScrollView>
   );
 }
+
+export const options = {
+  headerShown: false,
+  title: 'Login/Register',
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -194,11 +198,12 @@ const styles = StyleSheet.create({
     bottom: -9
   },
   loginButton: {
-    backgroundColor: "#007AFF",
+    // backgroundColor: "#007AFF",
     borderRadius: 8,
-    padding: 14,
+    padding: 11,
     alignItems: "center",
     marginTop: 16,
+    Height: 40
   },
   loginButtonText: {
     color: "#fff",

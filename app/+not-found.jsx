@@ -1,13 +1,31 @@
-import { Link, Stack } from 'expo-router';
+import { useAuth } from '@/context/AuthContext';
+import { Link, Stack, useNavigation } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
+import CustomLoader from "@/components/CustomLoader";
+import { useEffect } from 'react';
 
 export default function NotFoundScreen() {
+  const { user, userLoading } = useAuth();
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    if(user){
+      navigation.replace("(tabs)");
+    }else{
+      navigation.navigate("auth/index");
+    }
+  }, [user, userLoading])
+  
+  if(userLoading){
+    return <CustomLoader/>
+  }
+
   return (
     <>
-      <Stack.Screen options={{ title: 'Oops!(404)', headerShown: false }} />
+      <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.container}>
         <Text type="title" style={{color: "#eee5d3"}}>This screen doesn't exist.</Text>
-        <Link href="/" style={styles.link}>
+        <Link href="/chat" style={styles.link}>
           <Text type="link">Go to home screen!</Text>
         </Link>
       </View>

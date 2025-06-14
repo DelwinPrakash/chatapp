@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { View, TextInput, FlatList, Pressable, Text, Image } from 'react-native';
-import { supabase } from '../../lib/supabase';
-import { useAuth } from '../../context/AuthContext';
-import { useNavigation } from 'expo-router';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
+import { useNavigation, useRouter } from 'expo-router';
 
 export default function Index() {
     const [searchTerm, setSearchTerm] = useState('');
@@ -11,6 +11,7 @@ export default function Index() {
 
     const { user } = useAuth();
     const navigation = useNavigation();
+    const router = useRouter();
 
     const handleSearch = async () => {
         if (!searchTerm.trim()) return;
@@ -20,8 +21,6 @@ export default function Index() {
             const { data, error } = await supabase
                 .from('profiles')
                 .select('id, username, avatar_url')
-                // .or(`username.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`)
-                // .or(`username.ilike.%${searchTerm}%`)
                 .ilike('username', `%${searchTerm}%`)
                 .neq('id', user.id)
                 .limit(20);
@@ -52,7 +51,7 @@ export default function Index() {
                 .maybeSingle();
 
             if (existingChat) {
-                navigation.navigate('chat/[id]', { chatId: existingChat.conversation_id });
+                router.push({pathname: '/chat/[id]', params: {id: existingChat.conversation_id}});
                 return;
             }
 
@@ -77,7 +76,7 @@ export default function Index() {
                 { conversation_id: newConversation.id, user_id: userId }
             ]);
     
-            navigation.navigate('chat/[id]', { chatId: newConversation.id });
+            router.push({pathname: '/chat/[id]', params: {id: newConversation.id}});
 
         }catch(error){
             console.log(error)

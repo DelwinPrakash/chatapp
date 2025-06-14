@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, TextInput, Alert } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, TextInput, Alert } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from 'expo-router';
+import CustomLoader from "@/components/CustomLoader"
 
 export default function Profile() {
     const { user, logout, userLoading } = useAuth();
@@ -44,9 +45,7 @@ export default function Profile() {
 
     if (loading) {
         return (
-            <View style={[styles.container, styles.center]}>
-                <ActivityIndicator size="large" color="#00f0ff" />
-            </View>
+            <CustomLoader/>
         );
     }
 
@@ -116,35 +115,7 @@ export default function Profile() {
                             </View>
                         </View>
                     </View>
-                </View>       
-
-                {/* <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Account Settings</Text>
-                    <TouchableOpacity style={styles.menuItem}>
-                        <Ionicons name="settings" size={24} color="#3e787a" />
-                        <Text style={styles.menuText}>General Settings</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.menuItem}>
-                        <Ionicons name="notifications" size={24} color="#3e787a" />
-                        <Text style={styles.menuText}>Notification Settings</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.menuItem}>
-                        <Ionicons name="lock-closed" size={24} color="#3e787a" />
-                        <Text style={styles.menuText}>Privacy & Security</Text>
-                    </TouchableOpacity>
                 </View>
-                
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Support</Text>
-                    <TouchableOpacity style={styles.menuItem}>
-                        <Ionicons name="help-circle" size={24} color="#3e787a" />
-                        <Text style={styles.menuText}>Help Center</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.menuItem}>
-                        <Ionicons name="information-circle" size={24} color="#3e787a" />
-                        <Text style={styles.menuText}>About ChatApp</Text>
-                    </TouchableOpacity>
-                </View> */}
                 
                 <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
                     <Text style={styles.logoutText}>Sign Out</Text>
@@ -245,29 +216,6 @@ const styles = StyleSheet.create({
         color: '#b5b1b1',
         marginBottom: 4,
     },
-    // section: {
-    //     marginBottom: 20,
-    // },
-    // sectionTitle: {
-    //     fontSize: 18,
-    //     fontWeight: 'bold',
-    //     color: '#3e787a',
-    //     marginBottom: 15,
-    //     paddingLeft: 10,
-    // },
-    // menuItem: {
-    //     flexDirection: 'row',
-    //     alignItems: 'center',
-    //     backgroundColor: '#171616',
-    //     padding: 16,
-    //     borderRadius: 10,
-    //     marginBottom: 12,
-    // },
-    // menuText: {
-    //     fontSize: 16,
-    //     color: '#eee5da',
-    //     marginLeft: 15,
-    // },
     logoutButton: {
         backgroundColor: '#eee5da',
         padding: 16,
